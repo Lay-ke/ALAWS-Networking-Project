@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Person Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { margin-bottom: 20px; }
+        input, button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Person Management</h1>
+
+    <!-- Form to add a person -->
+    <h2>Add a Person</h2>
+    <form id="addPersonForm">
+        <input type="text" id="Code" placeholder="Code" required>
+        <input type="text" id="FirstName" placeholder="First Name" required>
+        <input type="text" id="LastName" placeholder="Last Name" required>
+        <input type="text" id="PlaceOfRecidence" placeholder="Place of Residence" required>
+        <button type="submit">Add Person</button>
+    </form>
+
+    <!-- Form to update a person -->
+    <h2>Update a Person</h2>
+    <form id="updatePersonForm">
+        <input type="text" id="updateCode" placeholder="Code" required>
+        <input type="text" id="updateFirstName" placeholder="First Name" required>
+        <input type="text" id="updateLastName" placeholder="Last Name" required>
+        <input type="text" id="updatePlaceOfRecidence" placeholder="Place of Residence" required>
+        <button type="submit">Update Person</button>
+    </form>
+
+    <!-- Button to view all people -->
+    <h2>View All People</h2>
+    <button id="viewPeopleBtn">View People</button>
+    <ul id="peopleList"></ul>
+
+    <script>
+        // Handle Add Person form submission
+        document.getElementById('addPersonForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const personData = {
+                Code: document.getElementById('Code').value,
+                FirstName: document.getElementById('FirstName').value,
+                LastName: document.getElementById('LastName').value,
+                PlaceOfRecidence: document.getElementById('PlaceOfRecidence').value,
+            };
+
+            const response = await fetch('/add-person', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(personData),
+            });
+
+            if (response.ok) {
+                alert('Person added successfully!');
+            } else {
+                alert('Failed to add person!');
+            }
+        });
+
+        // Handle Update Person form submission
+        document.getElementById('updatePersonForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const updatedData = {
+                FirstName: document.getElementById('updateFirstName').value,
+                LastName: document.getElementById('updateLastName').value,
+                PlaceOfRecidence: document.getElementById('updatePlaceOfRecidence').value,
+            };
+
+            const response = await fetch(`/update-person/${document.getElementById('updateCode').value}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedData),
+            });
+
+            if (response.ok) {
+                alert('Person updated successfully!');
+            } else {
+                alert('Failed to update person!');
+            }
+        });
+
+        // Handle View All People
+        document.getElementById('viewPeopleBtn').addEventListener('click', async function() {
+            const response = await fetch('/people');
+            const people = await response.json();
+            const peopleList = document.getElementById('peopleList');
+            peopleList.innerHTML = '';
+
+            people.forEach(person => {
+                const li = document.createElement('li');
+                li.textContent = `${person.FirstName} ${person.LastName} (${person.Code}) - ${person.PlaceOfRecidence}`;
+                peopleList.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
